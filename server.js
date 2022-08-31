@@ -2,40 +2,55 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const server = express();
-const weather = require('./data/weather.json');
-
+const weathData = require('./data/weather.json');
 
 server.use(cors());
+// local ip address
+//port
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
-server.use('*', (req,res) => res.status(404).send('page not found'));
+//http://localhost:3000/
+server.get('/', (req, res) => {
+  console.log("test home route");
+  res.send('Hi from the home roure');
+})
+//http://localhost:3000/test
+server.get('/test', (req, res) => {
+  console.log("test route");
+  res.send('Hi from the test roure');
+})
 
+
+
+//http://localhost:3000/weather
 server.get('/weather', (req, res) => {
-  let {searchQuery,lat,lon} = req.query;
+  let searchQuery = weathData.map((item) => {
+    if (item.city_name == req.query.name) {
+      return item;
+    }
+    return true;
+  })
+  res.send(searchQuery);
+})
 
-  const city = weather.find(city => city.city_name.toLocaleLowerCase() === searchQuery.toLocaleLowerCase());
 
-  try
-  {
-    const weatherArray = city.data.find(day => new Forcast(day));
-    res.status(200).send(weatherArray);
-  }
-  catch(error)
-  {
-    errorHandler(error, res);
-  }
+// http://localhost:3000/getweathData?name=weatherCityName
+server.get('/getweathData', (req, res) => {
+  console.log(req.query.name);
+  let weatherCityName = weathData.map((item) => {
+    return item.city_name;
+  })
+  res.send(weatherCityName);
+})
 
-});
+//http://localhost:3000/getweathData?
 
-function Forcast(day) {
-  this.date = day.valid_date
-  this.description = day.wether.description
-}
+server.listen(PORT, () => {
+  console.log(`Hello I am lisiting on ${PORT}`);
+})
 
-function errorHandler(error, res) {
-  console.log(error);
-  res.status(500).send('something went wrong');
-}
 
-server.listen(PORT, () => console.log(`listening on ${PORT}`));
+server.get("*", (req, res) => {
+  res.send("eror 404");
+})  
