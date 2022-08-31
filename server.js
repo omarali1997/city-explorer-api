@@ -29,7 +29,7 @@ server.get('/weather', (req, res) => {
     if (item.city_name == req.query.name) {
       return item;
     }
-    // return true;
+    return true;
   })
   res.send(searchQuery);
 })
