@@ -25,11 +25,11 @@ server.get('/test', (req, res) => {
 
 //http://localhost:3000/weather
 server.get('/weather', (req, res) => {
-  let searchQuery = weathData.map((item) => {
+  let searchQuery = weathData.find((item) => {
     if (item.city_name == req.query.name) {
       return item;
     }
-    return true;
+    // return true;
   })
   res.send(searchQuery);
 })
