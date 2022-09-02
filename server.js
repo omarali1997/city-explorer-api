@@ -2,55 +2,43 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const server = express();
-const weathData = require('./data/weather.json');
+const weather = require('./data/weather.json');
 
 server.use(cors());
-// local ip address
-//port
 
 const PORT = process.env.PORT;
 
-//http://localhost:3000/
-server.get('/', (req, res) => {
-  console.log("test home route");
-  res.send('Hi from the home roure');
-})
-//http://localhost:3000/test
-server.get('/test', (req, res) => {
-  console.log("test route");
-  res.send('Hi from the test roure');
-})
+server.get('/weather',handleWeather);
+server.use('*',(request, response) => response.status(404).send('Page not found'));
+
+function handleWeather(request, response) {
+  let {searchQuery,latitude,longitude} = request.query;
+  
+
+  const city = weather.find(city => city.city_name?.toLowerCase() === searchQuery?.toLowerCase());
+  // console.log(city);
+
+  try{
+    const weatatherArray = city.data.map(day => new Forecast(day));
+    // console.log(weatatherArray);
+    response.status(200).send(weatatherArray);
+  }catch(error) {
+    errorHandler(error, response);
+  }
+}
 
 
-
-//http://localhost:3000/weather
-server.get('/weather', (req, res) => {
-  let searchQuery = weathData.find((item) => {
-    if (item.city_name == req.query.name) {
-      return item;
-    }
-    return true;
-  })
-  res.send(searchQuery);
-})
+class Forecast{
+  constructor(day){
+    this.date = day.valid_date
+    this.description = day.weather.description  
+  }
+}
 
 
-// http://localhost:3000/getweathData?name=weatherCityName
-server.get('/getweathData', (req, res) => {
-  console.log(req.query.name);
-  let weatherCityName = weathData.map((item) => {
-    return item.city_name;
-  })
-  res.send(weatherCityName);
-})
+function errorHandler(error,response) {
+  console.log(error);
+  response.status(500).send('something went wrong');
+}
 
-//http://localhost:3000/getweathData?
-
-server.listen(PORT, () => {
-  console.log(`Hello I am lisiting on ${PORT}`);
-})
-
-
-server.get("*", (req, res) => {
-  res.send("eror 404");
-})  
+server.listen(PORT, () => console.log(`listening on ${PORT}`));
