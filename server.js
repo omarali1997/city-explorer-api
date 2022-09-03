@@ -16,7 +16,7 @@ server.use('*',(request, response) => response.status(404).send('Page not found'
 function handleWeather(request, response) {
   let {searchQuery,latitude,longitude} = request.query;
 
-  // searchQuery = 'amman';
+  searchQuery = '';
   const city = weather.find(city => city.city_name.toLowerCase() === searchQuery.toLowerCase());
   // console.log(city);
 
