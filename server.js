@@ -1,3 +1,5 @@
+'use strict';
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,14 +15,14 @@ server.use('*',(request, response) => response.status(404).send('Page not found'
 
 function handleWeather(request, response) {
   let {searchQuery,latitude,longitude} = request.query;
-  
 
-  const city = weather.find(city => city.city_name?.toLowerCase() === searchQuery?.toLowerCase());
+  // searchQuery = 'amman';
+  const city = weather.find(city => city.city_name.toLowerCase() === searchQuery.toLowerCase());
   // console.log(city);
 
   try{
     const weatatherArray = city.data.map(day => new Forecast(day));
-    // console.log(weatatherArray);
+    // console.log(city.city_name);
     response.status(200).send(weatatherArray);
   }catch(error) {
     errorHandler(error, response);
